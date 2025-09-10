@@ -1,0 +1,48 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model SearchQuery {
+  id          String   @id @default(cuid())
+  query       String
+  results     Int
+  blocked     Int
+  timestamp   DateTime @default(now())
+  ipAddress   String?
+  userAgent   String?
+  
+  @@map("search_queries")
+}
+
+model BlockedDomain {
+  id          String   @id @default(cuid())
+  domain      String   @unique
+  reason      String?
+  category    String?
+  blockedAt   DateTime @default(now())
+  lastChecked DateTime @default(now())
+  
+  @@map("blocked_domains")
+}
+
+model SearchLog {
+  id          String   @id @default(cuid())
+  queryId     String
+  domain      String
+  isBlocked   Boolean
+  reason      String?
+  category    String?
+  timestamp   DateTime @default(now())
+  
+  @@map("search_logs")
+  @@index([queryId])
+  @@index([domain])
+}
